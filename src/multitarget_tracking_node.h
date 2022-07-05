@@ -12,9 +12,7 @@ struct GaussianMixtureComponent2D {
     float sigmaY; // Variance of GM in y-direction
 };
 
-// Multiple weighted Gaussians together form a mixture
-struct GaussianMixture {
-    std::vector<GaussianMixtureComponent2D> models;
-};
+// A vector of weighted Gaussian components forms a mixture/belief of the current state
+std::vector<GaussianMixtureComponent2D> Belief;
 
 #endif  // MULTITARGET_TRACKING_NODE_H_

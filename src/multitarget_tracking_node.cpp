@@ -5,6 +5,10 @@
 
 #include "multitarget_tracking_node.h"
 
+// Initialize Gaussian Mixture component & belief
+GaussianMixtureComponent2D InitialGMComp;
+
+
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
@@ -28,6 +32,14 @@ int main(int argc, char **argv)
    * NodeHandle destructed will close down the node.
    */
   ros::NodeHandle n;
+
+  // With nodehandle created, populate initial belief GM with node's launch parameters
+  n.param<float> ("mu_x", InitialGMComp.muX, 0.0);
+  n.param<float> ("mu_y", InitialGMComp.muY, 0.0);
+  n.param<float> ("sigma_x", InitialGMComp.sigmaX, 0.5);
+  n.param<float> ("sigma_y", InitialGMComp.sigmaY, 0.5);
+  n.param<float> ("weight", InitialGMComp.weight, 1.0);
+  Belief.push_back(InitialGMComp);
 
   /**
    * The advertise() function is how you tell ROS that you want to
