@@ -17,4 +17,4 @@ struct GaussianMixture {
     std::vector<GaussianMixtureComponent2D> models;
 };
 
-#endif  // FOO_BAR_BAZ_H_
+#endif  // MULTITARGET_TRACKING_NODE_H_
