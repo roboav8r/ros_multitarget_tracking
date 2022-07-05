@@ -130,11 +130,15 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/ros_multitarget_tracking_node.cpp)
-add_executable(talker src/talker.cpp)
-target_link_libraries(talker ${catkin_LIBRARIES})
 
-add_executable(listener src/listener.cpp)
-target_link_libraries(listener ${catkin_LIBRARIES})
+# add_executable(talker src/talker.cpp)
+# target_link_libraries(talker ${catkin_LIBRARIES})
+
+# add_executable(listener src/listener.cpp)
+# target_link_libraries(listener ${catkin_LIBRARIES})
+
+add_executable(multitarget_tracker src/multitarget_tracking_node.cpp)
+target_link_libraries(multitarget_tracker ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
