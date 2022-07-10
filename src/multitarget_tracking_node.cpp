@@ -6,8 +6,8 @@
 #include "std_msgs/String.h"
 
 #include "multitarget_tracking_node.h"
-#include "ros_multitarget_tracking/Gaussian2D.h"
-#include "ros_multitarget_tracking/GaussianMixture2D.h"
+#include "ros_multitarget_tracking/GaussianModel.h"
+#include "ros_multitarget_tracking/GaussianMixture.h"
 
 // Debug independent assert statement
 #define ASSERT(x) if (not x) throw(std::exception())
@@ -52,9 +52,9 @@ int main(int argc, char **argv)
   }
 
   // Initialize publisher and messages
-  // ros::Publisher state_pub = n.advertise<ros_multitarget_tracking::GaussianMixture2D>("multitarget_state", 1000);
-  // ros_multitarget_tracking::GaussianMixture2D BeliefMsg;
-  // ros_multitarget_tracking::Gaussian2D GaussianMsg;
+  ros::Publisher state_pub = n.advertise<ros_multitarget_tracking::GaussianMixture>("multitarget_state", 1000);
+  ros_multitarget_tracking::GaussianMixture beliefMsg;
+  ros_multitarget_tracking::GaussianModel gmMsg;
 
   ros::Rate loop_rate(10);
 
@@ -63,17 +63,13 @@ int main(int argc, char **argv)
   {
 
     // Populate state belief message with current Gaussians
-    // BeliefMsg.models.clear();
+    beliefMsg.models.clear();
   
-    // for (auto model : Belief) {
-    //   GaussianMsg.weight = model.weight;
-    //   GaussianMsg.mu_x = model.muX;
-    //   GaussianMsg.mu_y = model.muY;
-    //   GaussianMsg.sigma_x = model.sigmaX;
-    //   GaussianMsg.sigma_y = model.sigmaY;
-    //   BeliefMsg.models.push_back(GaussianMsg);
+    for (auto model : gmPhd.belief) {
+      gmMsg.weight = model.weight;
+      beliefMsg.models.push_back(gmMsg);
 
-    // } // for model : Belief
+    } // for model : Belief
 
     /**
      * The publish() function is how you send messages. The parameter

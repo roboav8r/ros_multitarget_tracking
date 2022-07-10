@@ -1,2 +1,2 @@
 Header header
-ros_multitarget_tracking/Gaussian2D[] models
+ros_multitarget_tracking/GaussianModel[] models
