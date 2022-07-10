@@ -45,8 +45,8 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg message_gen
 ## Generate messages in the 'msg' folder
 add_message_files(
   FILES
-  Gaussian2D.msg
-  GaussianMixture2D.msg
+  GaussianModel.msg
+  GaussianMixture.msg
 )
 
 ## Generate services in the 'srv' folder
