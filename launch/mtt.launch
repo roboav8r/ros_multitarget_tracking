@@ -2,19 +2,30 @@
 <launch>
 
 <!-- Define initial belief of Gaussian Mixture -->
-<arg name="mu_x_0" default="3.0" />
+<!-- <arg name="mu_x_0" default="3.0" />
 <arg name="mu_y_0" default="0.0" />
 <arg name="sigma_x_0" default="0.5" />
 <arg name="sigma_y_0" default="0.5" />
-<arg name="weight_0" default="1.0" />
+<arg name="weight_0" default="1.0" /> -->
 
-<!-- Launch multitarget tracker node -->
-<node name="mtt_node" pkg="ros_multitarget_tracking" type="multitarget_tracker" >
-    <param name="mu_x" value="$(arg mu_x_0)" />
-    <param name="mu_y" value="$(arg mu_y_0)" />
-    <param name="sigma_x" value="$(arg sigma_x_0)" />
-    <param name="sigma_y" value="$(arg sigma_y_0)" />
-    <param name="weight" value="$(arg weight_0)" />
-</node>
+    <!-- Load initial state and tracker parameters into the tracker node's namespace from file-->
+    <group ns="mtt_node">
+        <rosparam file="$(find ros_multitarget_tracking)/config/tracker_params.yaml" />
+    </group>
+
+    <!-- Get parameter file path as an argument -->
+    <!-- <arg name="param_file" default="$(find ros_multitarget_tracking)/config/tracker_params.yaml"/> -->
+
+
+    <!-- Launch multitarget tracker node -->
+    <node name="mtt_node" pkg="ros_multitarget_tracking" type="multitarget_tracker" output="screen" /> 
+    <!-- args= "$(arg param_file)"/> -->
+    <!-- <node name="mtt_node" pkg="ros_multitarget_tracking" type="multitarget_tracker" >
+        <param name="mu_x" value="$(arg mu_x_0)" />
+        <param name="mu_y" value="$(arg mu_y_0)" />
+        <param name="sigma_x" value="$(arg sigma_x_0)" />
+        <param name="sigma_y" value="$(arg sigma_y_0)" />
+        <param name="weight" value="$(arg weight_0)" />
+    </node> -->
 
 </launch>

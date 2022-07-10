@@ -1,0 +1,5 @@
+# Initial state estimate
+x0: 
+    # Define weighted Gaussian Mixture components of the initial state estimate
+    - {weight: 1.0, mu: [1.0, 1.0, 0.1, 0.1], sigma: [0.25, 0.25, .025, .025]}
+    - {weight: 1.0, mu: [-1.0, -1.0, -0.1, -0.1], sigma: [0.25, 0.25, .025, .025]}
