@@ -12,6 +12,48 @@
 // Debug independent assert statement
 #define ASSERT(x) if (not x) throw(std::exception())
 
+// Define helper methods
+void PublishState (ros::Publisher& statePub, ros_multitarget_tracking::GaussianMixture& belMsg, ros_multitarget_tracking::GaussianModel& gaussMsg, GmPhdFilter& tracker)
+{
+  // Populate belief message header
+  belMsg.header.stamp = tracker.belief.Timestamp;
+
+  // Clear, then populate state belief message with current Gaussians
+  belMsg.models.clear();
+
+  for (auto& model : tracker.belief.GaussianMixtures) {
+    gaussMsg.weight = model.weight;
+    gaussMsg.mu.resize(model.state.size());
+    gaussMsg.sigma.resize(model.state.size());
+    for (int ii=0; ii< model.state.size(); ii++) {
+      gaussMsg.mu[ii] = model.state(ii);
+      gaussMsg.sigma[ii] = model.variance(ii);
+    };
+
+    // Add gaussian mixture message to belief message
+    belMsg.models.push_back(gaussMsg);
+
+  } // for model : Belief
+
+  // Publish current state estimate to ROS
+  statePub.publish(belMsg);
+};
+
+void GmPhdFilter::PredictExistingTargets(){
+  // Get current time and compute time since last state estimate
+  ros::Time predictTime = ros::Time::now();
+  ros::Duration deltaT = predictTime - this->belief.Timestamp;
+
+  // Debug information
+  ROS_DEBUG("Prediction time interval was %f seconds", deltaT.toSec());
+
+  // Update state estimate time
+  this->belief.Timestamp = predictTime;
+
+  // Propagate state forward
+};
+
+
 // Main loop
 int main(int argc, char **argv)
 {
@@ -25,6 +67,8 @@ int main(int argc, char **argv)
   int NumGMs = xInitial.size();
   std::cout << "Initializing state with " << NumGMs << " Gaussian Mixtures \n";
   ROS_INFO("Initializing state with %i Gaussian Mixtures", NumGMs);
+
+
 
   // Initialize tracker object with size = number of state vectors
   GmPhdFilter gmPhd(4);
@@ -40,8 +84,8 @@ int main(int argc, char **argv)
     // Assign gaussian mixture values from input file to temporary variable gmComp
     gmComp.weight = (double)gm["weight"];
     for (int jj = 0; jj < gm["mu"].size(); jj++) {
-      gmComp.state(jj) = gm["mu"][jj];
-      gmComp.variance(jj) = gm["sigma"][jj];
+      gmComp.state(jj) = (double)gm["mu"][jj];
+      gmComp.variance(jj) = (double)gm["sigma"][jj];
     };
 
     std::cout << "Got GM component with weight = " << gmComp.weight << ", state = " << gmComp.state << ", and variance = " << gmComp.variance << "\n"; 
@@ -50,11 +94,16 @@ int main(int argc, char **argv)
     gmPhd.belief.GaussianMixtures.push_back(gmComp);
 
   }
+  
+  // Add timestamp to current belief
+  gmPhd.belief.Timestamp = ros::Time::now();
+
 
   // Initialize publisher and messages
   ros::Publisher state_pub = n.advertise<ros_multitarget_tracking::GaussianMixture>("multitarget_state", 1000);
   ros_multitarget_tracking::GaussianMixture beliefMsg;
   ros_multitarget_tracking::GaussianModel gmMsg;
+
 
   ros::Rate loop_rate(10);
 
@@ -62,28 +111,16 @@ int main(int argc, char **argv)
   while (ros::ok())
   {
 
-    // Populate state belief message with current Gaussians
-    beliefMsg.models.clear();
-  
-    for (auto model : gmPhd.belief) {
-      gmMsg.weight = model.weight;
-      beliefMsg.models.push_back(gmMsg);
+    // Predict/propagate last state forward in time
+    gmPhd.PredictExistingTargets();
 
-    } // for model : Belief
-
-    /**
-     * The publish() function is how you send messages. The parameter
-     * is the message object. The type of this object must agree with the type
-     * given as a template parameter to the advertise<>() call, as was done
-     * in the constructor above.
-     */
-    // state_pub.publish(BeliefMsg);
+    // Publish current state
+    PublishState (state_pub, beliefMsg, gmMsg, gmPhd);
 
     ros::spinOnce();
 
     loop_rate.sleep();
   }
-
 
   return 0;
 }

@@ -21,37 +21,42 @@ struct GaussianMixtureComponent {
 
 // A timestamped vector of weighted Gaussian Mixture components forms a mixture/belief of the current state
 struct StateEstimate {
-
+    ros::Time Timestamp;
     std::vector<GaussianMixtureComponent> GaussianMixtures;
 };
 
 
 // Create class for tracker objects
 class GmPhdFilter {
+    public:
+        // Constructor
+        GmPhdFilter(int numStateVars) 
+            : nStateVars(numStateVars), 
+            processTransition{MatrixXd::Zero(numStateVars,numStateVars)}, 
+            processCovariance{MatrixXd::Zero(numStateVars,numStateVars)}
+            //belief(numStateVars)
+        {
+            std::cout << "Created GM-PHD filter for system with " << this->nStateVars << " state variables \n";
+            ROS_INFO("Created GM-PHD filter for system with %i state variables", this->nStateVars);
+        };
 
-public:
-    // Constructor
-    GmPhdFilter(int numStateVars) 
-        : nStateVars(numStateVars), 
-        processTransition{MatrixXd::Zero(numStateVars,numStateVars)}, 
-        processCovariance{MatrixXd::Zero(numStateVars,numStateVars)}
-        //belief(numStateVars)
-    {
-        std::cout << "Created GM-PHD filter for system with " << this->nStateVars << " state variables \n";
-        ROS_INFO("Created GM-PHD filter for system with %i state variables", this->nStateVars);
-    };
 
+        int nStateVars{4}; //Number of dimensions in state vector
+        
+        StateEstimate belief; // Current state estimate/Belief
 
-    int nStateVars{4}; //Number of dimensions in state vector
-    
-    StateEstimate belief; // Current state estimate/Belief
+        // Predict/propagate existing targets forward in time using transition matrix and process covariance matrix
+        void PredictExistingTargets();
 
-private:
-    MatrixXd processTransition{4,4};
-    MatrixXd processCovariance{4,4};
+    private:
+        MatrixXd processTransition{4,4};
+        MatrixXd processCovariance{4,4};
 };
 
 // Initialize variable to store ROS parameter values
 XmlRpc::XmlRpcValue xInitial;
+
+// Function to publish current state message
+void PublishState(ros::Publisher* statePub, GmPhdFilter* tracker);
 
 #endif  // MULTITARGET_TRACKING_NODE_H_
