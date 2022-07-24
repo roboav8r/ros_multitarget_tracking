@@ -139,7 +139,7 @@ include_directories(
 # add_executable(listener src/listener.cpp)
 # target_link_libraries(listener ${catkin_LIBRARIES})
 
-add_executable(multitarget_tracker src/multitarget_tracking_node.cpp)
+add_executable(multitarget_tracker src/multitarget_tracking_node.cpp src/system_models.cpp)
 target_link_libraries(multitarget_tracker ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix

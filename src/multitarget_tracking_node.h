@@ -7,6 +7,8 @@
 
 #include <XmlRpcValue.h>
 
+#include <system_models.h>
+
 
 using std::vector;
 using Eigen::VectorXd;
@@ -31,9 +33,7 @@ class GmPhdFilter {
     public:
         // Constructor
         GmPhdFilter(int numStateVars) 
-            : nStateVars(numStateVars), 
-            processTransition{MatrixXd::Zero(numStateVars,numStateVars)}, 
-            processCovariance{MatrixXd::Zero(numStateVars,numStateVars)}
+            : nStateVars(numStateVars)
             //belief(numStateVars)
         {
             std::cout << "Created GM-PHD filter for system with " << this->nStateVars << " state variables \n";
@@ -48,9 +48,6 @@ class GmPhdFilter {
         // Predict/propagate existing targets forward in time using transition matrix and process covariance matrix
         void PredictExistingTargets();
 
-    private:
-        MatrixXd processTransition{4,4};
-        MatrixXd processCovariance{4,4};
 };
 
 // Initialize variable to store ROS parameter values

@@ -1,7 +1,5 @@
 #include <sstream>
 
-//#include <Eigen/Dense>
-
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 
